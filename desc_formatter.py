@@ -8,6 +8,7 @@ class HelpFormatter(argparse.HelpFormatter):
     cmd_max_width = 12
 
     def format_sub_action(self, action, ident=2):
+        print(action)
         if not isinstance(action, argparse._SubParsersAction):
             return None
         help = ""
@@ -22,6 +23,7 @@ class HelpFormatter(argparse.HelpFormatter):
         return help
 
     def _format_action(self, action):
+        print(action)
         if isinstance(action, argparse._SubParsersAction):
             return self.format_sub_action(action=action)
         return super()._format_action(action)
