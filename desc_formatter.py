@@ -3,7 +3,7 @@
 
 import argparse
 
-class HelpFormatter(argparse.HelpFormatter):
+class HelpFormatter(argparse.RawTextHelpFormatter):
 
     cmd_max_width = 12
 

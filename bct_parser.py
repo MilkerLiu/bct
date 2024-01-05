@@ -1,26 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import argparse, textwrap, inspect
-from bct_cmd import Cmd, Opts
+from bct_cmd import Cmd, Arguments
 from desc_formatter import HelpFormatter
+
+__all__ = [
+    'add_cmd',
+]
 
 def add_cmd(cmd: type[Cmd], ap:argparse.ArgumentParser = None):
     """
     """
-    meta = _parse_doc(cmd)
+    args = [(key, comment) for (key, comment) in _parse_args(cmd._arguments).items() if cmd.args_filter(key)]
+    doc = "\n".join([line.strip() for line in cmd.__doc__.split('\n')])
+    desc = f"{cmd._name or ''}\n{cmd._title}\n{doc}"
     if ap == None:
         # root
-        _ap = argparse.ArgumentParser(description=meta['desc'], formatter_class=HelpFormatter)
+        _ap = argparse.ArgumentParser(description=desc, formatter_class=lambda prog: HelpFormatter(prog, max_help_position=36))
     else:
         sub_ap = ap.add_subparsers(title="Commands", metavar="")
-        _ap = sub_ap.add_parser(name=meta['name'], 
-                               help=meta['help'], 
-                               formatter_class=argparse.RawTextHelpFormatter,
-                               description=textwrap.dedent(meta['doc'])
+        _ap = sub_ap.add_parser(name=cmd._name, 
+                               help=cmd._title, 
+                               formatter_class=lambda prog: HelpFormatter(prog, max_help_position=36),
+                               description=textwrap.dedent(desc)
         )
 
     # add args
-    for (key, comment) in meta['args']:
+    for (key, comment) in args:
         attr = getattr(cmd._arguments, key)
         attr.help = comment
         _ap._add_action(attr)
@@ -50,28 +56,9 @@ def _set_call(ap:argparse.ArgumentParser):
     if opt:
         func(opt)
     else:
-        func()
-        
-def _parse_doc(cmd: type[Cmd]):
-    metas = {}
-    infos = cmd.__doc__.strip().split('\n')
-    for line in infos:
-        _l = line.strip()
-        if _l.startswith("@"):
-            spi = _l.index(':')
-            key = _l[1:spi].strip()
-            value = _l[spi+1:].strip()
-            metas[key] = value
-        else:
-            key = "doc"
-            value = '\n'.join(infos[len(metas.keys()):]).strip()
-            metas[key] = value
-            break
-    args = _parse_args(cmd._arguments)
-    metas['args'] = [(key, comment) for (key, comment) in args.items()]
-    return metas
+        func() 
 
-def _parse_args(args: type[Opts]):
+def _parse_args(args: type[Arguments]):
     field_comments = {}
     if args.__base__ and args.__base__ != object:
         field_comments = _parse_args(args.__base__)
