@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import bct_cmd
-from . import globe_args, cmd_1_1, cmd_1_2
+from . import globe_args, cmd_1_1
 
 class Arguments(globe_args.Arguments):
     target: str = bct_cmd.CommonArg(['-t', '--target'], dest='target')
