@@ -3,13 +3,9 @@
 import argparse
 
 __all__ = [
-    'Opts',
     'Cmd',
-    'CommonArg',
-    'TrueArg',
-    'FalseArg',
-    'ListArg',
-    'BoolArg'
+    'Arguments', 'EmptyArguments',
+    'CommonArg', 'TrueArg', 'FalseArg', 'ListArg', 'BoolArg',
 ]
 
 CommonArg = argparse._StoreAction
@@ -31,7 +27,9 @@ class Arguments:
     def __str__(self) -> str:
         args = ', '.join([f'{k}: {v}' for k, v in self.__dict__.items() if not k.startswith('_')])
         return f'{self.__class__} - args: {args}'
-    
+
+class EmptyArguments(Arguments):
+    pass
   
 
 class Cmd:

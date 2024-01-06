@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import bct_cmd
-from . import globe_args
+import global_args
 
-class Arguments(globe_args.Arguments):
+class Arguments(global_args.Arguments):
     pass
 
 class Cmd(bct_cmd.Cmd):
