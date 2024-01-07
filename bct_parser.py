@@ -8,15 +8,16 @@ __all__ = [
     'add_cmd',
 ]
 
-def add_cmd(cmd: type[bct_cmd.Cmd], ap:argparse.ArgumentParser = None, sub_ap: argparse._SubParsersAction = None):
+def add_cmd(cmd: type[bct_cmd.Cmd], sub_ap: argparse._SubParsersAction = None):
     """
     """
     args = [(key, comment) for (key, comment) in _parse_args(cmd._arguments).items() if cmd.args_filter(key)]
     doc = "\n".join([line.strip() for line in (cmd.__doc__ or "").split('\n')])
     desc = f"{cmd._name or ''}\n{cmd._title}\n{doc}"
-    is_root = ap == None
-    if ap == None:
-        ap = argparse.ArgumentParser(description=desc, formatter_class=lambda prog: desc_formatter.HelpFormatter(prog, max_help_position=36))
+    is_root = sub_ap == None
+    if sub_ap is None:
+        ap = argparse.ArgumentParser(description=desc, 
+                                     formatter_class=lambda prog: desc_formatter.HelpFormatter(prog, max_help_position=36))
     else:
         ap = sub_ap.add_parser(name=cmd._name, 
                                help=cmd._title, 
@@ -34,10 +35,9 @@ def add_cmd(cmd: type[bct_cmd.Cmd], ap:argparse.ArgumentParser = None, sub_ap: a
     ap.set_defaults(cmd=cmd)
 
     # add sub cmd
+    sub_ap = ap.add_subparsers(title="Commands", metavar="")
     for sub_cmd in cmd._sub_cmds:
-        if sub_ap == None:
-            sub_ap = ap.add_subparsers(title="Commands", metavar="")
-        add_cmd(sub_cmd, ap, sub_ap)
+        add_cmd(sub_cmd, sub_ap)
 
     # set call
     if is_root:
