@@ -14,7 +14,7 @@ FalseArg = argparse._StoreFalseAction
 ListArg = argparse._AppendAction
 BoolArg = argparse.BooleanOptionalAction
 
-class Arguments:
+class _Arguments:
 
     def __init__(self, args: argparse.Namespace = None) -> None:
         if args == None:
@@ -27,6 +27,11 @@ class Arguments:
     def __str__(self) -> str:
         args = ', '.join([f'{k}: {v}' for k, v in self.__dict__.items() if not k.startswith('_')])
         return f'{self.__class__} - args: {args}'
+    
+class Arguments(_Arguments):
+    verbose: bool = TrueArg(['-v', '--verbose'], dest='verbose')
+    """show debug log"""
+
 
 class EmptyArguments(Arguments):
     pass
