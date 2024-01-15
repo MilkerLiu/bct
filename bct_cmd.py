@@ -16,21 +16,23 @@ BoolArg = argparse.BooleanOptionalAction
 
 class _Arguments:
 
-    def __init__(self, args: argparse.Namespace = None) -> None:
-        if args == None:
-            return
-        for (key, value) in args.__dict__.items():
-            if callable(value):
+    def __init__(self, **kwargs) -> None:
+        for k in dir(self):
+            if k.startswith('_'):
                 continue
-            self.__setattr__(key, value)
+            setattr(self, k, getattr(self, k).default)
+        for (k, v) in kwargs.items():
+            if k.startswith('_'):
+                continue
+            setattr(self, k, v)
 
     def __str__(self) -> str:
         args = ', '.join([f'{k}: {v}' for k, v in self.__dict__.items() if not k.startswith('_')])
         return f'{self.__class__} - args: {args}'
     
+
 class Arguments(_Arguments):
-    verbose: bool = TrueArg(['-v', '--verbose'], dest='verbose')
-    """show debug log"""
+    pass
 
 
 class EmptyArguments(Arguments):
@@ -54,7 +56,7 @@ class Cmd:
     current cmd title, use for help title
     """
 
-    _arguments = Arguments
+    _arguments = EmptyArguments
     """
     cmd arguments
     """
