@@ -100,10 +100,6 @@ class Cmd(bct_cmd.Cmd):
     _arguments = Arguments
 
     @classmethod
-    def args_filter(self, argument: str): # 过滤掉部分用不到的命令
-        return argument not in ['target']
-
-    @classmethod
     def run(self, args: Arguments): # 执行命令
         print(self, args)
 ```

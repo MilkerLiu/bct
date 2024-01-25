@@ -5,7 +5,7 @@ import argparse
 __all__ = [
     'Cmd',
     'Arguments', 'EmptyArguments',
-    'CommonArg', 'TrueArg', 'FalseArg', 'ListArg', 'BoolArg',
+    'CommonArg', 'TrueArg', 'FalseArg', 'ListArg', 'BoolArg', 'VersionArg'
 ]
 
 CommonArg = argparse._StoreAction
@@ -13,6 +13,7 @@ TrueArg = argparse._StoreTrueAction
 FalseArg = argparse._StoreFalseAction
 ListArg = argparse._AppendAction
 BoolArg = argparse.BooleanOptionalAction
+VersionArg = argparse._VersionAction
 
 class _Arguments:
 
@@ -62,11 +63,6 @@ class Cmd:
     """
     _sub_cmds = []
     """sub commands"""
-
-    @classmethod
-    def args_filter(self, argument: str):
-        """Filter arguments, if return true, this args bind to current cmd"""
-        return True
 
     @classmethod
     def run(self, args: Arguments):

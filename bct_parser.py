@@ -3,6 +3,7 @@
 import argparse, textwrap, inspect
 import bct_cmd
 import desc_formatter
+import traceback
 
 __all__ = [
     'add_cmd',
@@ -13,7 +14,7 @@ root_cmd = None
 def add_cmd(cmd: type[bct_cmd.Cmd], ap:argparse.ArgumentParser = None, sub_ap: argparse._SubParsersAction = None):
     """
     """
-    args = [(key, comment) for (key, comment) in _parse_args(cmd._arguments).items() if cmd.args_filter(key)]
+    args = [(key, comment) for (key, comment) in _parse_args(cmd._arguments).items()]
     doc = "\n".join([line.strip() for line in (cmd.__doc__ or "").split('\n')])
     desc = f"{cmd._name or ''}\n{cmd._title}\n{doc}"
     is_root = ap == None
@@ -29,7 +30,7 @@ def add_cmd(cmd: type[bct_cmd.Cmd], ap:argparse.ArgumentParser = None, sub_ap: a
     # add args
     for (key, comment) in args:
         attr = getattr(cmd._arguments, key)
-        attr.help = comment
+        attr.help = attr.help or comment
         ap._add_action(attr)
 
     # add action
@@ -46,11 +47,15 @@ def add_cmd(cmd: type[bct_cmd.Cmd], ap:argparse.ArgumentParser = None, sub_ap: a
         root_cmd = ap
         args = ap.parse_args()
         # run default cmd for config
-        cmd.run(cmd._arguments(**args.__dict__))
-        # run sub cmd
         sub_cmd:bct_cmd.Cmd = args._cmd
-        sub_cmd.run(cmd._arguments(**args.__dict__))
-
+        
+        try:
+            cmd.run(sub_cmd._arguments(**args.__dict__))
+            sub_cmd.run(sub_cmd._arguments(**args.__dict__))
+        except Exception as e:
+            if not issubclass(type(e), AssertionError):
+                traceback.print_exc()
+            exit(1)
     return ap
 
 

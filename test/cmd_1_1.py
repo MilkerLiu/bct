@@ -16,9 +16,5 @@ class Cmd(bct_cmd.Cmd):
     _arguments = Arguments
 
     @classmethod
-    def args_filter(self, argument: str):
-        return argument not in ['target']
-
-    @classmethod
     def run(self, args: Arguments):
         print(self, args)
